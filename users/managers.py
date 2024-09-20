@@ -1,5 +1,5 @@
 from django.contrib.auth.models import BaseUserManager
-from users.services.model_service import TemporaryNickNameService
+from users.services.nickname_service import TemporaryNickNameService
 
 
 class UserManager(BaseUserManager):
