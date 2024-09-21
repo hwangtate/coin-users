@@ -3,7 +3,8 @@ from django.urls import path
 from users import views
 
 urlpatterns = [
-    # path("register", views.register, name="register"),
+    path("register", views.UserRegisterAPIView.as_view(), name="user_register"),
+    path("activate", views.ActivateUserAPIView.as_view(), name="activate_user"),
     # path("verify", views.verify, name="verify"),
     # path("login", views.login, name="login"),
     # path("logout", views.logout, name="logout"),

@@ -1,0 +1,8 @@
+.idea/
+
+.env
+
+config/__pycache__/*
+*.pyc
+
+poetry.lock
