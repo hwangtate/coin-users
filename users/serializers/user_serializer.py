@@ -24,3 +24,27 @@ class UserRegisterSerializer(serializers.Serializer):
             raise serializers.ValidationError("Email already registered")
 
         return data
+
+
+class UserLoginSerializer(serializers.Serializer):
+
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        email = data["email"]
+        password = data["password"]
+
+        try:
+            user = User.objects.get(email=email)
+
+        except User.DoesNotExist:
+            raise ValidationError({"message": "Email doesn't exist!"})
+
+        if not user.is_active:
+            raise ValidationError({"message": "User is not active!"})
+
+        if not user.check_password(password):
+            raise ValidationError({"message": "Invalid password"})
+
+        return data
