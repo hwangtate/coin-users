@@ -1,13 +1,13 @@
 from django.contrib.auth import login, logout, authenticate
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from users.models import User
-from users.permissions.user_permission import IsLoggedIn
-from users.serializers.user_serializer import UserRegisterSerializer, UserLoginSerializer
+from users.permissions.user_permission import IsLoggedIn, IsEmailVerified
+from users.serializers.user_serializer import UserRegisterSerializer, UserLoginSerializer, UserSerializer
 from users.services.mail_service import EmailService
 from users.services.user_service import UserService
 
@@ -86,3 +86,27 @@ class UserLogoutAPIView(APIView):
         }
 
         return Response(data, status=status.HTTP_200_OK)
+
+
+class UserProfileAPIView(APIView):
+    permission_classes = (IsAuthenticated, IsEmailVerified)
+
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+
+    def put(self, request):
+        user = request.user
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        user = request.user
+        logout(request)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

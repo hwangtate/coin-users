@@ -48,3 +48,28 @@ class UserLoginSerializer(serializers.Serializer):
             raise ValidationError({"message": "Invalid password"})
 
         return data
+
+
+class UserSerializer(serializers.ModelSerializer):
+    last_login = serializers.DateTimeField(format="%Y-%m-%d %H:%M", read_only=True)
+
+    class Meta:
+        model = User
+        exclude = [
+            "password",
+        ]
+        read_only_fields = [
+            "id",
+            "email",
+            # "nickname", 이름 변경 가능
+            # "password", 이미 exclude 에 포함 되어 있어서 read_only 임
+            "social_provider",
+            "ranking",
+            "email_confirmed",
+            "is_active",
+            "is_staff",
+            "is_superuser",
+            "created_at",
+            "updated_at",
+            "last_login",
+        ]
