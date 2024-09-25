@@ -150,3 +150,20 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+
+GOOGLE_CONFIG = {
+    # key
+    "CLIENT_ID": os.getenv("GOOGLE_CLIENT_ID"),
+    "CLIENT_SECRET": os.getenv("GOOGLE_CLIENT_SECRET"),
+    # uri
+    "PROFILE_URI": "https://www.googleapis.com/oauth2/v3/userinfo",
+    "LOGIN_URI": "https://accounts.google.com/o/oauth2/v2/auth",
+    "TOKEN_URI": "https://oauth2.googleapis.com/token",
+    "REDIRECT_URI": "http://127.0.0.1:8000/users/google/login/callback",
+    "SCOPE": "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile",
+    # type
+    "GRANT_TYPE": "authorization_code",
+    "CONTENT_TYPE": "application/x-www-form-urlencoded",
+    # host
+    "HOST": "oauth2.googleapis.com",
+}
