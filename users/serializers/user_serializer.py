@@ -73,3 +73,62 @@ class UserSerializer(serializers.ModelSerializer):
             "updated_at",
             "last_login",
         ]
+
+
+class UserChangeEmailSerializer(serializers.Serializer):
+    old_email = serializers.EmailField()
+    new_email = serializers.EmailField()
+
+    def validate(self, data):
+        old_email = data["old_email"]
+        new_email = data["new_email"]
+
+        user = self.context["user"]
+
+        if user.email != old_email:
+            raise ValidationError({"message": "Email doesn't match"})
+
+        if old_email == new_email:
+            raise ValidationError({"message": "Old email and New email must not match"})
+
+        if User.objects.filter(email=new_email).exists():
+            raise ValidationError({"message": "New Email already taken!"})
+
+        return data
+
+    def update(self, user, validated_data):
+        user.email = validated_data.get("new_email")
+        user.email_confirmed = False
+        user.save()
+        return user
+
+
+class UserResetPasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True)
+    password2 = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        old_password = data["old_password"]
+        user = self.context["user"]
+
+        if not user.check_password(old_password):
+            raise ValidationError({"message": "Invalid password"})
+
+        if old_password == data["password"] or old_password == data["password2"]:
+            raise ValidationError({"message": "New password cannot be the same as the old password."})
+
+        if data["password"] != data["password2"]:
+            raise serializers.ValidationError("Passwords must match")
+
+        try:
+            validate_password(data["password"])
+        except ValidationError as e:
+            raise serializers.ValidationError(e.messages)
+
+        return data
+
+    def update(self, user, validated_data):
+        user.set_password(validated_data.get("password"))
+        user.save()
+        return user

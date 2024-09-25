@@ -36,6 +36,16 @@ class EmailService:
 
         self.send_email(subject, message)
 
+    def send_change_email_mail(self, verification_url: str) -> None:
+        subject = "Confirm Your Email Change"
+        message = (
+            f"Hi {self.user.nickname},\n\n"
+            f"We received a request to change the email address associated with your account.\n\n"
+            f"To confirm this change, please click the link below:\n{verification_url}"
+        )
+
+        self.send_email(subject, message)
+
     @staticmethod
     def decode_signer(code: str) -> str | Response:
         signer = TimestampSigner()
@@ -47,16 +57,3 @@ class EmailService:
 
         except SignatureExpired:
             return Response("expired time...", status=status.HTTP_400_BAD_REQUEST)
-
-    # def send_change_email_mail(self):
-    #     uri = "verify"
-    #     verification_url = self.get_url(uri)
-    #
-    #     subject = "Confirm Your Email Change"
-    #     message = (
-    #         f"Hi {self.user.nickname},\n\n"
-    #         f"We received a request to change the email address associated with your account.\n\n"
-    #         f"To confirm this change, please click the link below:\n{verification_url}"
-    #     )
-    #
-    #     self.send_email(subject, message)

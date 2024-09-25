@@ -13,3 +13,10 @@ class IsLoggedIn(BasePermission):
 
     def has_permission(self, request, view):
         return not request.user.is_authenticated
+
+
+class IsNotSocialUser(BasePermission):
+    message = "Your account is social account. You can't change email or password."
+
+    def has_permission(self, request, view):
+        return request.user.social_provider is None

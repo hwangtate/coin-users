@@ -1,13 +1,18 @@
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from users.models import User
-from users.permissions.user_permission import IsLoggedIn, IsEmailVerified
-from users.serializers.user_serializer import UserRegisterSerializer, UserLoginSerializer, UserSerializer
+from users.permissions.user_permission import IsLoggedIn, IsEmailVerified, IsNotSocialUser
+from users.serializers.user_serializer import (
+    UserRegisterSerializer,
+    UserLoginSerializer,
+    UserSerializer,
+    UserChangeEmailSerializer,
+    UserResetPasswordSerializer,
+)
 from users.services.mail_service import EmailService
 from users.services.user_service import UserService
 
@@ -29,7 +34,7 @@ class UserRegisterAPIView(APIView):
         user = User.objects.create_user(nickname=nickname, email=email, password=password)
 
         email_service = EmailService(user)
-        activation_url = email_service.get_url(domain=f"{request.scheme}://{request.get_host()}", uri="/users/activate")
+        activation_url = email_service.get_url(domain=f"{request.scheme}://{request.get_host()}", uri="/users/verify")
         email_service.send_register_mail(activation_url)
 
         data = {"success": True, "nickname": nickname, "email": email}
@@ -37,7 +42,7 @@ class UserRegisterAPIView(APIView):
         return Response(data, status=status.HTTP_201_CREATED)
 
 
-class ActivateUserAPIView(APIView):
+class VerifyUserAPIView(APIView):
 
     permission_classes = (AllowAny,)
 
@@ -90,6 +95,7 @@ class UserLogoutAPIView(APIView):
 
 class UserProfileAPIView(APIView):
     permission_classes = (IsAuthenticated, IsEmailVerified)
+    serializer_class = UserSerializer
 
     def get_user(self):
         return self.request.user
@@ -115,3 +121,44 @@ class UserProfileAPIView(APIView):
         logout(request)
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UserChangeEmailAPIView(APIView):
+    permission_classes = (IsAuthenticated, IsEmailVerified, IsNotSocialUser)
+    serializer_class = UserChangeEmailSerializer
+
+    def post(self, request):
+        serializer = UserChangeEmailSerializer(data=request.data, context={"user": request.user})
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.get(email=request.user.email)
+        user = serializer.update(user, serializer.validated_data)
+
+        email_service = EmailService(user)
+        verification_url = email_service.get_url(domain=f"{request.scheme}://{request.get_host()}", uri="/users/verify")
+        email_service.send_change_email_mail(verification_url)
+
+        return Response(
+            {
+                "success": True,
+                "email": serializer.data["new_email"],
+            }
+        )
+
+
+class UserResetPasswordAPIView(APIView):
+    permission_classes = (IsAuthenticated, IsEmailVerified, IsNotSocialUser)
+    serializer_class = UserResetPasswordSerializer
+
+    def post(self, request):
+        serializer = UserResetPasswordSerializer(data=request.data, context={"user": request.user})
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        user = request.user
+        serializer.update(user, serializer.validated_data)
+
+        return Response({"message": "Password reset successfully."}, status=status.HTTP_200_OK)
