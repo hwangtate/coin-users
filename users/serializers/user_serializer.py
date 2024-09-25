@@ -11,7 +11,7 @@ class UserRegisterSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
 
-    def validate(self, data):
+    def validate(self, data: dict) -> dict:
         if data["password"] != data["password2"]:
             raise serializers.ValidationError("Passwords must match")
 
@@ -31,7 +31,7 @@ class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
-    def validate(self, data):
+    def validate(self, data: dict) -> dict:
         email = data["email"]
         password = data["password"]
 
@@ -57,6 +57,8 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         exclude = [
             "password",
+            "groups",
+            "user_permissions",
         ]
         read_only_fields = [
             "id",
@@ -79,7 +81,7 @@ class UserChangeEmailSerializer(serializers.Serializer):
     old_email = serializers.EmailField()
     new_email = serializers.EmailField()
 
-    def validate(self, data):
+    def validate(self, data: dict) -> dict:
         old_email = data["old_email"]
         new_email = data["new_email"]
 
@@ -96,7 +98,7 @@ class UserChangeEmailSerializer(serializers.Serializer):
 
         return data
 
-    def update(self, user, validated_data):
+    def update(self, user: User, validated_data: dict) -> User:
         user.email = validated_data.get("new_email")
         user.email_confirmed = False
         user.save()
@@ -108,7 +110,7 @@ class UserResetPasswordSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
 
-    def validate(self, data):
+    def validate(self, data: dict) -> dict:
         old_password = data["old_password"]
         user = self.context["user"]
 
@@ -128,7 +130,7 @@ class UserResetPasswordSerializer(serializers.Serializer):
 
         return data
 
-    def update(self, user, validated_data):
+    def update(self, user: User, validated_data: dict) -> User:
         user.set_password(validated_data.get("password"))
         user.save()
         return user
