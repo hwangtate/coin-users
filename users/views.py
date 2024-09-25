@@ -91,22 +91,27 @@ class UserLogoutAPIView(APIView):
 class UserProfileAPIView(APIView):
     permission_classes = (IsAuthenticated, IsEmailVerified)
 
+    def get_user(self):
+        return self.request.user
+
     def get(self, request):
-        user = request.user
+        user = self.get_user()
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
     def put(self, request):
-        user = request.user
+        user = self.get_user()
         serializer = UserSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
+
+        if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        serializer.update(user, serializer.validated_data)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def delete(self, request):
-        user = request.user
+        user = self.get_user()
         logout(request)
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
