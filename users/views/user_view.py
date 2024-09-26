@@ -1,17 +1,18 @@
 from django.contrib.auth import login, logout
+
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from users.models import User
-from users.permissions.user_permission import IsLoggedIn, IsEmailVerified, IsNotSocialUser
+from users.permissions.user_permission import IsEmailVerified, IsLoggedIn, IsNotSocialUser
 from users.serializers.user_serializer import (
-    UserRegisterSerializer,
-    UserLoginSerializer,
-    UserSerializer,
     UserChangeEmailSerializer,
+    UserLoginSerializer,
+    UserRegisterSerializer,
     UserResetPasswordSerializer,
+    UserSerializer,
 )
 from users.services.mail_service import EmailService
 from users.services.user_service import UserService

@@ -1,15 +1,16 @@
 from django.contrib.auth import login
 from django.shortcuts import redirect
+
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from config.settings import GOOGLE_CONFIG
+
 from users.models import User
 from users.permissions.user_permission import IsLoggedIn
-from users.services.social_login_service import SocialLoginService, SocialLoginCallbackService
-
-from config.settings import GOOGLE_CONFIG
+from users.services.social_login_service import SocialLoginCallbackService, SocialLoginService
 
 
 class GoogleLoginAPIView(APIView):

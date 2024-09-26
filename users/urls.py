@@ -1,7 +1,7 @@
 from django.urls import path
 
-from users.views import user_view as views
 from users.views import oauth_view
+from users.views import user_view as views
 
 urlpatterns = [
     path("register", views.UserRegisterAPIView.as_view(), name="user_register"),

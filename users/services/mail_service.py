@@ -1,6 +1,6 @@
-from django.core.mail import send_mail
 from django.core import signing
-from django.core.signing import TimestampSigner, SignatureExpired
+from django.core.mail import send_mail
+from django.core.signing import SignatureExpired, TimestampSigner
 from rest_framework import status
 from rest_framework.response import Response
 
