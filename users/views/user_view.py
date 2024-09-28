@@ -14,6 +14,7 @@ from users.serializers.user_serializer import (
     UserResetPasswordSerializer,
     UserSerializer,
 )
+from users.services.jwt_service import generate_access_token, generate_refresh_token
 from users.services.mail_service import EmailService
 from users.services.user_service import UserService
 
@@ -67,31 +68,37 @@ class UserLoginAPIView(APIView):
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
 
-        if not serializer.is_valid():
+        if serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.get(email=serializer.validated_data["email"])
-        login(request, user)
+
+        access_token = generate_access_token(user)
+        refresh_token = generate_refresh_token(user)
 
         data = {
             "success": True,
             "email": serializer.data["email"],
+            "access_token": access_token,
         }
 
-        return Response(data, status=status.HTTP_200_OK)
+        response = Response(data, status=status.HTTP_200_OK)
+        # HttpOnly 쿠키에 refresh 토큰 저장
+        response.set_cookie("refresh_token", refresh_token, httponly=True, samesite="Strict")
+        response.set_cookie("access_token", access_token, httponly=True, samesite="Strict")
+
+        return response
 
 
 class UserLogoutAPIView(APIView):
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        logout(request)
+        response = Response({"success": True}, status=status.HTTP_200_OK)
+        response.delete_cookie("refresh_token")
+        response.delete_cookie("access_token")
 
-        data = {
-            "success": True,
-        }
-
-        return Response(data, status=status.HTTP_200_OK)
+        return response
 
 
 class UserProfileAPIView(APIView):
