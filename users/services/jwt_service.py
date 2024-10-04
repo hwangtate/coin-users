@@ -5,9 +5,9 @@ import jwt
 from config import settings
 
 
-def generate_access_token(user):
+def generate_access_token(user_id):
     access_token_payload = {
-        "user_id": user.id,
+        "user_id": user_id,
         "exp": datetime.now() + timedelta(minutes=1),
         "iat": datetime.now(),
     }
@@ -15,9 +15,9 @@ def generate_access_token(user):
     return access_token
 
 
-def generate_refresh_token(user):
+def generate_refresh_token(user_id):
     refresh_token_payload = {
-        "user_id": user.id,
+        "user_id": user_id,
         "exp": datetime.now() + timedelta(days=7),
         "iat": datetime.now(),
     }

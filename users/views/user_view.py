@@ -1,4 +1,5 @@
 from django.contrib.auth import login, logout
+from django.contrib.auth.models import AnonymousUser
 
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -20,7 +21,6 @@ from users.services.user_service import UserService
 
 
 class UserRegisterAPIView(APIView):
-    permission_classes = (AllowAny, IsLoggedIn)
     serializer_class = UserRegisterSerializer
 
     def post(self, request):
@@ -46,8 +46,6 @@ class UserRegisterAPIView(APIView):
 
 class VerifyUserAPIView(APIView):
 
-    permission_classes = (AllowAny,)
-
     def get(self, request):
         code = request.GET.get("code", "")
         email = EmailService.decode_signer(code)
@@ -62,19 +60,18 @@ class VerifyUserAPIView(APIView):
 
 
 class UserLoginAPIView(APIView):
-    permission_classes = (AllowAny,)
     serializer_class = UserLoginSerializer
 
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
 
-        if serializer.is_valid():
+        if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.get(email=serializer.validated_data["email"])
 
-        access_token = generate_access_token(user)
-        refresh_token = generate_refresh_token(user)
+        access_token = generate_access_token(user.id)
+        refresh_token = generate_refresh_token(user.id)
 
         data = {
             "success": True,
@@ -91,25 +88,31 @@ class UserLoginAPIView(APIView):
 
 
 class UserLogoutAPIView(APIView):
-    permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         response = Response({"success": True}, status=status.HTTP_200_OK)
         response.delete_cookie("refresh_token")
         response.delete_cookie("access_token")
+        response.delete_cookie("sessionid")
 
         return response
 
 
 class UserProfileAPIView(APIView):
-    permission_classes = (IsAuthenticated, IsEmailVerified)
     serializer_class = UserSerializer
 
     def get_user(self):
-        return self.request.user
+        if self.request.user == AnonymousUser():
+            raise User.DoesNotExist
+        user = User.objects.get(id=self.request.user)
+        return user
 
     def get(self, request):
-        user = self.get_user()
+        try:
+            user = self.get_user()
+        except User.DoesNotExist:
+            return Response({"success": False}, status=status.HTTP_401_UNAUTHORIZED)
+
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
@@ -132,7 +135,6 @@ class UserProfileAPIView(APIView):
 
 
 class UserChangeEmailAPIView(APIView):
-    permission_classes = (IsAuthenticated, IsEmailVerified, IsNotSocialUser)
     serializer_class = UserChangeEmailSerializer
 
     def post(self, request):
@@ -157,7 +159,7 @@ class UserChangeEmailAPIView(APIView):
 
 
 class UserResetPasswordAPIView(APIView):
-    permission_classes = (IsAuthenticated, IsEmailVerified, IsNotSocialUser)
+
     serializer_class = UserResetPasswordSerializer
 
     def post(self, request):

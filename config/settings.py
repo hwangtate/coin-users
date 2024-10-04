@@ -51,10 +51,10 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
+    "users.middlewares.jwt_middleware.JWTMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "users.middlewares.jwt_middleware.JWTMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -88,7 +88,12 @@ DATABASES = {
     }
 }
 
-
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "users.authentication.CookieJWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+}
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
