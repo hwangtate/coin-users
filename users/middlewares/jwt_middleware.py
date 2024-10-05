@@ -5,7 +5,6 @@ from django.core.cache import cache
 from jwt import decode
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
-from users.models import User
 from users.services.jwt_service import generate_access_token
 
 
@@ -14,14 +13,16 @@ class JWTMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        token = request.COOKIES.get("access_token")
+        if not token:
+            return self.get_response(request)
+
         try:
-            token = request.COOKIES.get("access_token")
-            if not token:
-                return self.get_response(request)
-            payload = decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+            decode(token, settings.SECRET_KEY, algorithms=["HS256"])
 
         except ExpiredSignatureError:
-            refresh_token = cache.get("refresh_token")
+            user_id = decode(token, settings.SECRET_KEY, algorithms=["HS256"], options={"verify_exp": False})["user_id"]
+            refresh_token = cache.get(f"refresh_token_{user_id}")
 
             if refresh_token:
                 try:

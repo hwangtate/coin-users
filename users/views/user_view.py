@@ -77,7 +77,10 @@ class UserLoginAPIView(APIView):
         access_token = generate_access_token(user.id)
         refresh_token = generate_refresh_token(user.id)
 
-        cache.set("refresh_token", refresh_token, timeout=60 * 60 * 24 * 7)
+        print(f"Saving refresh token for user {user.id}: {refresh_token}")
+        cache.add(f"refresh_token_{user.id}", refresh_token, timeout=60 * 60 * 24 * 7)
+        print(f"Refresh token saved for user {user.id}")
+
         data = {
             "success": True,
             "email": serializer.data["email"],
@@ -87,9 +90,7 @@ class UserLoginAPIView(APIView):
         response = Response(data, status=status.HTTP_200_OK)
         # HttpOnly 쿠키에 refresh 토큰 저장
         # refresh token을 레디스에 저장하는 로직 구현 필요
-
         response.set_cookie("access_token", access_token, httponly=True, samesite="Strict")
-
         return response
 
 

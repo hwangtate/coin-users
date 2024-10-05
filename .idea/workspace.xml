@@ -4,13 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e305080c-9dc7-4f91-bf88-48e00832c1ed" name="Changes" comment="Feat: Jwt middleware, Auth 쿼리문 줄이면서 잘 수정했음&#10;&#10;안되는 엔드포인트들 있긴 함 user.objects.get에서 email로 가져와서그럼">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+    <list default="true" id="e305080c-9dc7-4f91-bf88-48e00832c1ed" name="Changes" comment="Feat: Redis에 Refresh token 저장 및 로그인 로그아웃">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/7bd0a8ff-6063-4ae8-9cd8-ec8205b6f3dc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/7bd0a8ff-6063-4ae8-9cd8-ec8205b6f3dc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/poetry.lock" beforeDir="false" afterPath="$PROJECT_DIR$/poetry.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/users/middlewares/jwt_middleware.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/middlewares/jwt_middleware.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/users/views/user_view.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/views/user_view.py" afterDir="false" />
     </list>
@@ -229,7 +226,7 @@
       <workItem from="1728009772368" duration="610000" />
       <workItem from="1728020193340" duration="11571000" />
       <workItem from="1728102255586" duration="2024000" />
-      <workItem from="1728111002024" duration="8856000" />
+      <workItem from="1728111002024" duration="11896000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize Commit">
       <option name="closed" value="true" />
@@ -263,7 +260,23 @@
       <option name="project" value="LOCAL" />
       <updated>1728038918331</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Feat: Redis에 Refresh token 저장">
+      <option name="closed" value="true" />
+      <created>1728120653066</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1728120653066</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Feat: Redis에 Refresh token 저장 및 로그인 로그아웃">
+      <option name="closed" value="true" />
+      <created>1728120673855</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1728120673855</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -274,7 +287,9 @@
     <MESSAGE value="Feat: Jwt middleware 구현&#10;&#10;했지만 ㅈ됐다 로그인 할때 serializer에서 에러가 발생해도 쿠키에&#10;token들이 저장되고 저장된 token들로 로그인이 됨...." />
     <MESSAGE value="Feat: Jwt middleware," />
     <MESSAGE value="Feat: Jwt middleware, Auth 쿼리문 줄이면서 잘 수정했음&#10;&#10;안되는 엔드포인트들 있긴 함 user.objects.get에서 email로 가져와서그럼" />
-    <option name="LAST_COMMIT_MESSAGE" value="Feat: Jwt middleware, Auth 쿼리문 줄이면서 잘 수정했음&#10;&#10;안되는 엔드포인트들 있긴 함 user.objects.get에서 email로 가져와서그럼" />
+    <MESSAGE value="Feat: Redis에 Refresh token 저장" />
+    <MESSAGE value="Feat: Redis에 Refresh token 저장 및 로그인 로그아웃" />
+    <option name="LAST_COMMIT_MESSAGE" value="Feat: Redis에 Refresh token 저장 및 로그인 로그아웃" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
