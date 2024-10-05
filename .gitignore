@@ -1,8 +1,11 @@
+__pycache__/
 .idea/
+venv/
 
 .env
+.coverage
 
-config/__pycache__/*
-*.pyc
-
-poetry.lock
+.DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store

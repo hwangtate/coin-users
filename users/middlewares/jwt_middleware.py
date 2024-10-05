@@ -7,6 +7,11 @@ from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
 from users.services.jwt_service import generate_access_token
 
+"""
+과연 JsonResponse로 리턴 하는게 맞을까?
+아니면 raise로 에러를 일으키는게 맞을까? 
+"""
+
 
 class JWTMiddleware:
     def __init__(self, get_response):
