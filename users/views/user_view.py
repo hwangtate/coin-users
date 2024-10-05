@@ -1,5 +1,9 @@
+import json
+from datetime import timedelta
+
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import AnonymousUser
+from django.core.cache import cache
 
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -73,6 +77,7 @@ class UserLoginAPIView(APIView):
         access_token = generate_access_token(user.id)
         refresh_token = generate_refresh_token(user.id)
 
+        cache.set("refresh_token", refresh_token, timeout=60 * 60 * 24 * 7)
         data = {
             "success": True,
             "email": serializer.data["email"],
@@ -81,7 +86,8 @@ class UserLoginAPIView(APIView):
 
         response = Response(data, status=status.HTTP_200_OK)
         # HttpOnly 쿠키에 refresh 토큰 저장
-        response.set_cookie("refresh_token", refresh_token, httponly=True, samesite="Strict")
+        # refresh token을 레디스에 저장하는 로직 구현 필요
+
         response.set_cookie("access_token", access_token, httponly=True, samesite="Strict")
 
         return response
@@ -91,8 +97,10 @@ class UserLogoutAPIView(APIView):
 
     def post(self, request):
         response = Response({"success": True}, status=status.HTTP_200_OK)
-        response.delete_cookie("refresh_token")
+        # 레디스에 저장한 refresh token 삭제 필요
+        cache.delete("refresh_token")
         response.delete_cookie("access_token")
+        # social login은 아직 세션으로 처리하는 중이라 sessionid 삭제
         response.delete_cookie("sessionid")
 
         return response
@@ -143,7 +151,7 @@ class UserChangeEmailAPIView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.get(email=request.user.email)
+        user = User.objects.get(id=request.user)
         user = serializer.update(user, serializer.validated_data)
 
         email_service = EmailService(user)
@@ -168,7 +176,7 @@ class UserResetPasswordAPIView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        user = request.user
+        user = User.objects.get(id=request.user)
         serializer.update(user, serializer.validated_data)
 
         return Response({"message": "Password reset successfully."}, status=status.HTTP_200_OK)

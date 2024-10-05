@@ -1,5 +1,7 @@
 from django.http import JsonResponse
 from django.conf import settings
+from django.core.cache import cache
+
 from jwt import decode
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
@@ -19,7 +21,8 @@ class JWTMiddleware:
             payload = decode(token, settings.SECRET_KEY, algorithms=["HS256"])
 
         except ExpiredSignatureError:
-            refresh_token = request.COOKIES.get("refresh_token")
+            refresh_token = cache.get("refresh_token")
+
             if refresh_token:
                 try:
                     refresh_payload = decode(refresh_token, settings.SECRET_KEY, algorithms=["HS256"])
