@@ -30,7 +30,7 @@ SECRET_KEY = "django-insecure-4+)8_v70xmv7ub*ox93dxu4z83e!wza4&f$e7sl!2&#j9p6qgt
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 AUTH_USER_MODEL = "users.User"
 # Application definition
@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "users.apps.UsersConfig",
     "rest_framework",
+    "worker.apps.WorkerConfig",
 ]
 
 MIDDLEWARE = [
@@ -184,3 +185,9 @@ GOOGLE_CONFIG = {
     # host
     "HOST": "oauth2.googleapis.com",
 }
+
+CELERY_TIMEZONE = "Asia/Seoul"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6380/0")
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL

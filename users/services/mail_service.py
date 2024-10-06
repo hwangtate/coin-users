@@ -1,9 +1,12 @@
+from celery import shared_task
+
 from django.core import signing
-from django.core.mail import send_mail
+
 from django.core.signing import SignatureExpired, TimestampSigner
 from rest_framework import status
 from rest_framework.response import Response
 
+from worker.task import send_email_task
 from config.settings import EMAIL_HOST_USER
 from users.models import User
 
@@ -26,7 +29,7 @@ class EmailService:
         return f"{front_uri}{back_uri}"
 
     def send_email(self, subject: str, message: str) -> None:
-        send_mail(subject, message, self.email_from, self.recipient_list)
+        send_email_task.delay(subject, message, self.email_from, self.recipient_list)
 
     def send_register_mail(self, activation_url: str) -> None:
         subject = "Confirm your Account"
