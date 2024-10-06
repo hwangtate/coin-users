@@ -99,7 +99,7 @@ class UserLogoutAPIView(APIView):
     def post(self, request):
         response = Response({"success": True}, status=status.HTTP_200_OK)
         # 레디스에 저장한 refresh token 삭제 필요
-        cache.delete("refresh_token")
+        cache.delete(f"refresh_token_{request.user}")
         response.delete_cookie("access_token")
         # social login은 아직 세션으로 처리하는 중이라 sessionid 삭제
         response.delete_cookie("sessionid")
@@ -120,7 +120,7 @@ class UserProfileAPIView(APIView):
         try:
             user = self.get_user()
         except User.DoesNotExist:
-            return Response({"success": False}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"success": "Not Provided User"}, status=status.HTTP_401_UNAUTHORIZED)
 
         serializer = UserSerializer(user)
         return Response(serializer.data)
